@@ -15,3 +15,9 @@ git clone https://github.com/kdh4970/isaacsim_g1_locomotion.git
 
 ./python.sh ./isaacsim_g1_locomotion/run.py
 ```
+
+## Demo Video
+
+
+https://github.com/user-attachments/assets/670f9fca-d928-4fdb-a4c9-f959c069e5dc
+
