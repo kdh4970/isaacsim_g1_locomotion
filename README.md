@@ -9,7 +9,7 @@ IsaacSIM standalone script for Velocity based Unitree G1 locomotion.
 ## How to use  
 
 ```
-cd isaacsim # Change it to your isaacsim path
+cd $HOME/isaacsim # Change it to your isaacsim directory.
 
 git clone https://github.com/kdh4970/isaacsim_g1_locomotion.git
 
