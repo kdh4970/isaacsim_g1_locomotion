@@ -29,9 +29,6 @@ LAUNCH_CONFIG = {
 
 app = SimulationApp(launch_config=LAUNCH_CONFIG)
 
-
-import asyncio
-
 import carb.tokens
 import numpy as np
 import omni.kit.commands
@@ -39,10 +36,8 @@ import omni.kit.commands
 import omni.kit.test
 from isaacsim.core.api import World
 from isaacsim.core.utils.prims import get_prim_at_path
-from isaacsim.core.utils.rotations import quat_to_euler_angles
 from isaacsim.core.utils.stage import create_new_stage
 from g1 import G1FlatTerrainPolicy
-from pxr import UsdPhysics
 
 
 World.clear_instance()
@@ -58,7 +53,6 @@ if not ground_prim.IsValid() or not ground_prim.IsActive():
     _world.scene.add_default_ground_plane()
 
 _base_command = [0, 0, 0]
-_stage = omni.usd.get_context().get_stage()
 _g1 = None
 
 def on_physics_step(step_size):
