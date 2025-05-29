@@ -9,10 +9,12 @@ IsaacSIM standalone script for velocity based Unitree G1 locomotion.
 ## How to use  
 
 ```
-cd $HOME/isaacsim # Change it to your isaacsim directory.
+# Change it to your isaacsim directory.
+cd $HOME/isaacsim
 
 git clone https://github.com/kdh4970/isaacsim_g1_locomotion.git
 
+# Use isaacsim python.
 ./python.sh ./isaacsim_g1_locomotion/run.py
 ```
 
