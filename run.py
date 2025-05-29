@@ -93,7 +93,7 @@ def _on_keyboard_event(event):
         # Arrow keys map to pre-defined command vectors to control navigation of robot
         if event.input.name in _key_to_control:
             _base_command = _key_to_control[event.input.name]
-            print(f"Keybord : {event.input.name}")
+            print(f"Keyboard : {event.input.name}")
         if event.input.name == "ESCAPE":
             print("Resetting simulation.")
             _world.stop()
