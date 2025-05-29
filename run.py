@@ -37,7 +37,7 @@ from isaacsim.core.api import World
 from isaacsim.core.utils.prims import get_prim_at_path
 from isaacsim.core.utils.stage import create_new_stage
 from g1 import G1FlatTerrainPolicy
-
+from isaacsim.core.utils.stage import open_stage
 World.clear_instance()
 create_new_stage()
 _physics_rate, _render_rate = 100, 30
