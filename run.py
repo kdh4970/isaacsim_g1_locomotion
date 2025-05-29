@@ -32,44 +32,52 @@ app = SimulationApp(launch_config=LAUNCH_CONFIG)
 import carb.tokens
 import numpy as np
 import omni.kit.commands
-
 import omni.kit.test
 from isaacsim.core.api import World
 from isaacsim.core.utils.prims import get_prim_at_path
 from isaacsim.core.utils.stage import create_new_stage
 from g1 import G1FlatTerrainPolicy
 
-
 World.clear_instance()
 create_new_stage()
 _physics_rate, _render_rate = 100, 30
 _physics_dt = 1 / _physics_rate
 _render_dt = 1 / _render_rate
-_world = World(stage_units_in_meters=1.0, physics_dt=_physics_dt, rendering_dt=_render_dt)
+_world = None
 
-ground_prim = get_prim_at_path("/World/defaultGroundPlane")
-# Create the physics ground plane if it hasn't been created
-if not ground_prim.IsValid() or not ground_prim.IsActive():
-    _world.scene.add_default_ground_plane()
+def init():
+    global _world, tick, _base_command
+    create_new_stage()
+    _world = World(stage_units_in_meters=1.0, physics_dt=_physics_dt, rendering_dt=_render_dt)
+    ground_prim = get_prim_at_path("/World/defaultGroundPlane")
+    # Create the physics ground plane if it hasn't been created
+    if not ground_prim.IsValid() or not ground_prim.IsActive():
+        _world.scene.add_default_ground_plane()
 
-_base_command = [0, 0, 0]
-_g1 = None
+    _base_command = [0, 0, 0]
+    tick=0
+    _g1 = None
 
-def on_physics_step(step_size):
-    if _g1:
-        _g1.forward(step_size, _base_command)
+    def on_physics_step(step_size):
+        if _g1:
+            _g1.forward(step_size, _base_command)
 
-_prim_path = "/World/g1"
+    _prim_path = "/World/g1"
 
-_g1 = G1FlatTerrainPolicy(prim_path=_prim_path, name="g1", position=np.array([0, 0, 0.76]))
-_world.reset()
+    _g1 = G1FlatTerrainPolicy(prim_path=_prim_path, name="g1", position=np.array([0, 0, 0.76]))
+    _world.reset()
+    _g1.initialize()
 
-_g1.initialize()
+    _world.add_physics_callback("physics_step", callback_fn=on_physics_step)
 
-_world.add_physics_callback("physics_step", callback_fn=on_physics_step)
+    print("[ Control Instructions ]")
+    print(" ↑ : Move Forward")
+    print(" ↓ : Stop")
+    print(" ← : Rotate Left")
+    print(" → : Rotate Right")
+    print(" ESC : Reset Simulation")
 
-print("robot articulation passed")
-
+init()
 _key_to_control = {
     "UP": [0.5,0,0],
     "DOWN": [0,0,0],
@@ -77,9 +85,7 @@ _key_to_control = {
     "RIGHT": [0,0,-1],
     "ZEROS": [0,0,0],
 }
-
 # Set up Keyboard
-
 def _on_keyboard_event(event):
     global _base_command
     """Checks for a keyboard event and assign the corresponding command control depending on key pressed."""
@@ -88,6 +94,10 @@ def _on_keyboard_event(event):
         if event.input.name in _key_to_control:
             _base_command = _key_to_control[event.input.name]
             print(f"Keybord : {event.input.name}")
+        if event.input.name == "ESCAPE":
+            print("Resetting simulation.")
+            _world.stop()
+            init()
     # On key release, the robot stops moving
     elif event.type == carb.input.KeyboardEventType.KEY_RELEASE:
         _base_command = _key_to_control["ZEROS"]
@@ -99,12 +109,12 @@ _sub_keyboard = _input.subscribe_to_keyboard_events(_keyboard, _on_keyboard_even
 
 from time import perf_counter
 
+
+
 _base_command = [0, 0, 0]
-next_physics_time = 0
-next_render_time = 0
+tick = 0
 while app.is_running():
     app.update()
-    tick=0
     while _world.is_playing():
         now = perf_counter()
         if tick==0:
@@ -121,3 +131,5 @@ while app.is_running():
 
         
         tick += 1
+    break
+app.close()
