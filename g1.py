@@ -14,7 +14,7 @@ import omni
 import omni.kit.commands
 from isaacsim.core.utils.rotations import quat_to_rot_matrix
 from isaacsim.core.utils.types import ArticulationAction
-from .controllers import PolicyController
+from controllers.policy_controller import PolicyController
 from isaacsim.storage.native import get_assets_root_path
 from pathlib import Path
 import os 
