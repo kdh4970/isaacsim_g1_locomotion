@@ -1,6 +1,6 @@
 # isaacsim_g1_locomotion
 
-IsaacSIM standalone script for Velocity based Unitree G1 locomotion.  
+IsaacSIM standalone script for velocity based Unitree G1 locomotion.  
 
 * Based on IsaacSIM 4.5.0
 * Based on the code from isaacsim.robot.policy.examples
