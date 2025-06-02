@@ -47,13 +47,7 @@ _world = None
 
 def init():
     global _world, tick, _base_command
-    create_new_stage()
-    _world = World(stage_units_in_meters=1.0, physics_dt=_physics_dt, rendering_dt=_render_dt)
-    ground_prim = get_prim_at_path("/World/defaultGroundPlane")
-    # Create the physics ground plane if it hasn't been created
-    if not ground_prim.IsValid() or not ground_prim.IsActive():
-        _world.scene.add_default_ground_plane()
-
+    
     _base_command = [0, 0, 0]
     tick=0
     _g1 = None
@@ -77,7 +71,21 @@ def init():
     print(" → : Rotate Right")
     print(" ESC : Reset Simulation")
 
-init()
+create_new_stage()
+# usd_path = "/home/do/Desktop/IsaacSIM-Robot-Simulation/usd_scenes/Collected_office/office.usd"
+# open_stage(usd_path)
+stage = omni.usd.get_context().get_stage()
+app.update()
+
+
+
+_world = World(stage_units_in_meters=1.0, physics_dt=_physics_dt, rendering_dt=_render_dt)
+ground_prim = get_prim_at_path("/World/defaultGroundPlane")
+# Create the physics ground plane if it hasn't been created
+if not ground_prim.IsValid() or not ground_prim.IsActive():
+    _world.scene.add_default_ground_plane()
+
+
 _key_to_control = {
     "UP": [0.5,0,0],
     "DOWN": [0,0,0],
@@ -109,8 +117,6 @@ _sub_keyboard = _input.subscribe_to_keyboard_events(_keyboard, _on_keyboard_even
 
 from time import perf_counter
 
-
-
 _base_command = [0, 0, 0]
 tick = 0
 while app.is_running():
@@ -120,6 +126,7 @@ while app.is_running():
         if tick==0:
             next_physics_time = now
             next_render_time = now
+            init()
         
         while now > next_physics_time:
             _world.step(render = False)
@@ -131,5 +138,4 @@ while app.is_running():
 
         
         tick += 1
-    break
 app.close()
