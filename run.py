@@ -45,24 +45,20 @@ _physics_dt = 1 / _physics_rate
 _render_dt = 1 / _render_rate
 _world = None
 
+_g1 = None
+
 def init():
-    global _world, tick, _base_command
+    global _world, tick, _base_command, _g1
     
     _base_command = [0, 0, 0]
     tick=0
-    _g1 = None
 
-    def on_physics_step(step_size):
-        if _g1:
-            _g1.forward(step_size, _base_command)
 
     _prim_path = "/World/g1"
 
     _g1 = G1FlatTerrainPolicy(prim_path=_prim_path, name="g1", position=np.array([0, 0, 0.76]))
     _world.reset()
     _g1.initialize()
-
-    _world.add_physics_callback("physics_step", callback_fn=on_physics_step)
 
     print("[ Control Instructions ]")
     print(" ↑ : Move Forward")
@@ -71,12 +67,17 @@ def init():
     print(" → : Rotate Right")
     print(" ESC : Reset Simulation")
 
-create_new_stage()
+def g1_physics_callback():
+    def on_physics_step(step_size):
+        if _g1:
+            _g1.forward(step_size, _base_command)
+    _world.add_physics_callback("physics_step", callback_fn=on_physics_step)
+
+# create_new_stage()
 # usd_path = "/home/do/Desktop/IsaacSIM-Robot-Simulation/usd_scenes/Collected_office/office.usd"
 # open_stage(usd_path)
 stage = omni.usd.get_context().get_stage()
 app.update()
-
 
 
 _world = World(stage_units_in_meters=1.0, physics_dt=_physics_dt, rendering_dt=_render_dt)
@@ -116,51 +117,6 @@ _keyboard = omni.appwindow.get_default_app_window().get_keyboard()
 _sub_keyboard = _input.subscribe_to_keyboard_events(_keyboard, _on_keyboard_event)
 
 from time import perf_counter
-from pxr import UsdPhysics, Sdf
-## Configure Physics
-print(f"\n\n     Configuring Physics...\n")
-found_prims = []
-target_name = "physicsScene"
-for prim in stage.Traverse():
-    if prim.GetName() == target_name:
-        found_prims.append(prim.GetPath())
-
-physics_path=""
-if found_prims:
-    for path in found_prims:
-        physics_scene = UsdPhysics.Scene(stage.GetPrimAtPath(path))
-        physics_path = path
-else:
-    physics_path = "/physicsScene"
-    physics_scene = UsdPhysics.Scene.Define(stage, physics_path)
-
-
-# preset for best performance simulation
-omni.kit.commands.execute('ChangeProperty',
-	prop_path=Sdf.Path(f'{physics_path}.physxScene:solverType'),
-	value='PGS',
-	prev=None,
-	usd_context_name=stage)
-omni.kit.commands.execute('ChangeProperty',
-	prop_path=Sdf.Path(f'{physics_path}.physxScene:enableGPUDynamics'),
-	value=False,
-	prev=None,
-	usd_context_name=stage)
-omni.kit.commands.execute('ChangeProperty',
-	prop_path=Sdf.Path(f'{physics_path}.physxScene:broadphaseType'),
-	value='MBP',
-	prev=None,
-	usd_context_name=stage)
-omni.kit.commands.execute('ChangeProperty',
-	prop_path=Sdf.Path(f'{physics_path}.physxScene:enableCCD'),
-	value=False,
-	prev=None,
-	usd_context_name=stage)
-omni.kit.commands.execute('ChangeProperty',
-	prop_path=Sdf.Path(f'{physics_path}.physxScene:enableStabilization'),
-	value=True,
-	prev=None,
-	usd_context_name=stage)
 
 _base_command = [0, 0, 0]
 tick = 0
@@ -172,7 +128,8 @@ while app.is_running():
             next_physics_time = now
             next_render_time = now
             init()
-        
+            g1_physics_callback()
+
         while now > next_physics_time:
             _world.step(render = False)
             next_physics_time += _physics_dt
