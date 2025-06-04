@@ -116,6 +116,51 @@ _keyboard = omni.appwindow.get_default_app_window().get_keyboard()
 _sub_keyboard = _input.subscribe_to_keyboard_events(_keyboard, _on_keyboard_event)
 
 from time import perf_counter
+from pxr import UsdPhysics, Sdf
+## Configure Physics
+print(f"\n\n     Configuring Physics...\n")
+found_prims = []
+target_name = "physicsScene"
+for prim in stage.Traverse():
+    if prim.GetName() == target_name:
+        found_prims.append(prim.GetPath())
+
+physics_path=""
+if found_prims:
+    for path in found_prims:
+        physics_scene = UsdPhysics.Scene(stage.GetPrimAtPath(path))
+        physics_path = path
+else:
+    physics_path = "/physicsScene"
+    physics_scene = UsdPhysics.Scene.Define(stage, physics_path)
+
+
+# preset for best performance simulation
+omni.kit.commands.execute('ChangeProperty',
+	prop_path=Sdf.Path(f'{physics_path}.physxScene:solverType'),
+	value='PGS',
+	prev=None,
+	usd_context_name=stage)
+omni.kit.commands.execute('ChangeProperty',
+	prop_path=Sdf.Path(f'{physics_path}.physxScene:enableGPUDynamics'),
+	value=False,
+	prev=None,
+	usd_context_name=stage)
+omni.kit.commands.execute('ChangeProperty',
+	prop_path=Sdf.Path(f'{physics_path}.physxScene:broadphaseType'),
+	value='MBP',
+	prev=None,
+	usd_context_name=stage)
+omni.kit.commands.execute('ChangeProperty',
+	prop_path=Sdf.Path(f'{physics_path}.physxScene:enableCCD'),
+	value=False,
+	prev=None,
+	usd_context_name=stage)
+omni.kit.commands.execute('ChangeProperty',
+	prop_path=Sdf.Path(f'{physics_path}.physxScene:enableStabilization'),
+	value=True,
+	prev=None,
+	usd_context_name=stage)
 
 _base_command = [0, 0, 0]
 tick = 0
