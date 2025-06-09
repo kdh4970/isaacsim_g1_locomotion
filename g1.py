@@ -49,8 +49,7 @@ class G1FlatTerrainPolicy(PolicyController):
         assets_root_path = get_assets_root_path()
         print(assets_root_path)
         if usd_path == None:
-            # usd_path = assets_root_path + "/Isaac/IsaacLab/Robots/Unitree/G1/g1_minimal.usd"
-            usd_path = "/home/do/Desktop/IsaacSIM-Robot-Simulation/usd_scenes/g1.usd"
+            usd_path = assets_root_path + "/Isaac/IsaacLab/Robots/Unitree/G1/g1_minimal.usd"
             # usd_path = assets_root_path + "/Isaac/Robots/Unitree/G1/G1_with_hand/g1_29dof_with_hand_rev_1_0.usd"
         super().__init__(name, prim_path, root_path, usd_path, position, orientation)
 
